@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:restaurant_app/api_service.dart';
 import 'package:restaurant_app/data/model/restaurant_detail.dart';
-import 'package:restaurant_app/data/model/restaurant_list.dart';
 import 'package:restaurant_app/ui/restaurant_detail_page.dart';
-import 'package:http/http.dart' as http;
 
 class ListCard extends StatelessWidget{
-  final Restaurants restaurants;
+  final Restaurant restaurants;
 
   const ListCard({super.key, required this.restaurants});
 
