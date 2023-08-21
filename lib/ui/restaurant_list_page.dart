@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:restaurant_app/list_card.dart';
+import 'package:restaurant_app/provider/restaurant_provider.dart';
+import 'package:restaurant_app/ui/search_page.dart';
 
-import '../api_service.dart';
-import '../data/model/restaurant_list.dart';
-
-class RestaurantListPage extends StatefulWidget {
+class RestaurantListPage extends StatefulWidget{
   static const routeName = '/restaurant_list';
   const RestaurantListPage({Key? key}) : super(key: key);
 
@@ -12,63 +12,145 @@ class RestaurantListPage extends StatefulWidget {
   State<RestaurantListPage> createState() => _RestaurantListPageState();
 }
 
-class _RestaurantListPageState extends State<RestaurantListPage> {
-  late Future<RestaurantList> _restaurant;
+// class _RestaurantListPageState extends State<RestaurantListPage> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//           title: Column(
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: <Widget>[
+//               Row(
+//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                 children: <Widget>[
+//                   Text(
+//                     'Restaurant',
+//                     style: Theme.of(context).textTheme.headlineSmall,
+//                   ),
+//                   IconButton(
+//                     icon: const Icon(Icons.search),
+//                     onPressed: () {
+//                       Navigator.pushNamed(context, SearchPage.routeName);
+//                     },
+//                   ),
+//                 ],
+//               ),
+//               Text(
+//                 'Recommendations for you!',
+//                 style: Theme.of(context).textTheme.titleMedium,
+//               ),
+//               const SizedBox(height: 12),
+//             ],
+//           )),
+//       body: _buildList(),
+//     );
+//   }
+//
+//   Widget _buildList() {
+//     return Consumer<RestaurantProvider>(
+//       builder: (context, state, _) {
+//         if (state.state == ResultState.loading) {
+//           return const Center(child: CircularProgressIndicator());
+//         } else if (state.state == ResultState.hasData) {
+//           return ListView.builder(
+//             shrinkWrap: true,
+//             itemCount: state.result.restaurants.length,
+//             itemBuilder: (context, index) {
+//               var restaurants = state.result.restaurants[index];
+//               return ListCard(restaurants: restaurants);
+//             },
+//           );
+//         } else if (state.state == ResultState.noData) {
+//           return Center(
+//             child: Material(
+//               child: Text(state.message),
+//             ),
+//           );
+//         } else if (state.state == ResultState.error) {
+//           return Center(
+//             child: Material(
+//               child: Text(state.message),
+//             ),
+//           );
+//         } else {
+//           return const Center(
+//             child: Material(
+//               child: Text(''),
+//             ),
+//           );
+//         }
+//       },
+//     );
+//   }
+// }
 
-  @override
-  void initState() {
-    super.initState();
-    _restaurant = ApiService().showRestaurantList();
-  }
+class _RestaurantListPageState extends State<RestaurantListPage> {
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
           title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            'Restaurant',
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-          Text(
-            'Recommendations for you!',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: 4),
-        ],
-      )),
-      body: _buildList(context),
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                    'Restaurant',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.search),
+                    onPressed: () {
+                      showSearch(context: context, delegate: SearchPage());
+                    },
+                  ),
+                ],
+              ),
+              Text(
+                'Recommendations for you!',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 12),
+            ],
+          )),
+      body: _buildList(),
     );
   }
 
-  Widget _buildList(BuildContext context){
-    return FutureBuilder<RestaurantList>(
-      future: _restaurant,
-      builder: (context, AsyncSnapshot<RestaurantList> snapshot){
-        var state = snapshot.connectionState;
-        if (state != ConnectionState.done) {
+  Widget _buildList() {
+    return Consumer<RestaurantProvider>(
+      builder: (context, state, _) {
+        if (state.state == ResultState.loading) {
           return const Center(child: CircularProgressIndicator());
+        } else if (state.state == ResultState.hasData) {
+          return ListView.builder(
+            shrinkWrap: true,
+            itemCount: state.result.restaurants.length,
+            itemBuilder: (context, index) {
+              var restaurants = state.result.restaurants[index];
+              return ListCard(restaurants: restaurants);
+            },
+          );
+        } else if (state.state == ResultState.noData) {
+          return Center(
+            child: Material(
+              child: Text(state.message),
+            ),
+          );
+        } else if (state.state == ResultState.error) {
+          return Center(
+            child: Material(
+              child: Text(state.message),
+            ),
+          );
         } else {
-          if (snapshot.hasData) {
-            return ListView.builder(
-              shrinkWrap: true,
-              itemCount: snapshot.data?.restaurants.length,
-              itemBuilder: (context, index) {
-                var restaurants = snapshot.data?.restaurants[index];
-                return ListCard(restaurants: restaurants!);
-              },
-            );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Material(
-                child: Text(snapshot.error.toString()),
-              ),
-            );
-          } else {
-            return const Material(child: Text(''));
-          }
+          return const Center(
+            child: Material(
+              child: Text(''),
+            ),
+          );
         }
       },
     );

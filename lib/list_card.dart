@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:restaurant_app/data/model/restaurant_detail.dart';
 import 'package:restaurant_app/ui/restaurant_detail_page.dart';
 
+import 'data/model/restaurant_list.dart';
+
 class ListCard extends StatelessWidget{
-  final Restaurant restaurants;
+  final Restaurants restaurants;
 
   const ListCard({super.key, required this.restaurants});
 
@@ -57,7 +58,7 @@ class ListCard extends StatelessWidget{
           ),
           onTap: () {
             Navigator.pushNamed(context, RestaurantDetailPage.routeName,
-                arguments: restaurants.id);
+                arguments: restaurants);
           },
         ));
   }
