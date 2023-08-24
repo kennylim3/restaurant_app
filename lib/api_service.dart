@@ -32,9 +32,7 @@ class ApiService {
     final response = await http.get(Uri.parse("$_baseUrl/search?q=$query"));
     try{
       if(response.statusCode == 200){
-        if(query!=null){
-          return Search.fromJson(json.decode(response.body));
-        }
+        return Search.fromJson(json.decode(response.body));
       }else{
         throw Exception("Failed to load search result");
       }

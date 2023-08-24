@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:restaurant_app/data/model/restaurant_detail.dart';
 import 'package:restaurant_app/data/model/restaurant_list.dart';
 
 import '../api_service.dart';
 import '../data/model/search.dart';
+import 'package:http/http.dart' as http;
 
 enum ResultState { loading, noData, hasData, error }
 
@@ -47,10 +51,10 @@ class RestaurantProvider extends ChangeNotifier {
 
 class SearchProvider extends ChangeNotifier {
   final ApiService apiService;
-  late String query = "";
-  
-  SearchProvider({required this.apiService}) {
-    _fetchSearch();
+  late String searchQuery = "";
+
+  SearchProvider({required this.apiService, required this.searchQuery}){
+    fetchSearch(searchQuery);
   }
 
   late Search _searchResult;
@@ -59,15 +63,17 @@ class SearchProvider extends ChangeNotifier {
 
   String get message => _message;
 
+  String get query => searchQuery;
+
   Search get result => _searchResult;
 
   ResultState get state => _state;
 
-  Future<dynamic> _fetchSearch() async {
+  Future<dynamic> fetchSearch(searchQuery) async {
     try {
       _state = ResultState.loading;
       notifyListeners();
-      final restaurant = await apiService.searchRestaurant(query);
+      final restaurant = await apiService.searchRestaurant(searchQuery);
       if(_state == ResultState.loading){
         _state = ResultState.loading;
         notifyListeners();
@@ -75,7 +81,7 @@ class SearchProvider extends ChangeNotifier {
       } else if (restaurant.restaurants.isEmpty) {
         _state = ResultState.noData;
         notifyListeners();
-        return _message = 'Empty Data';
+        return _message = "There's no match to your search";
       } else {
         _state = ResultState.hasData;
         notifyListeners();

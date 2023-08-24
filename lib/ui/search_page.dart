@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../api_service.dart';
 import '../list_card.dart';
 import '../provider/restaurant_provider.dart';
 
@@ -205,13 +206,13 @@ import '../provider/restaurant_provider.dart';
 //   }
 // }
 
-class SearchPage extends SearchDelegate{
+class SearchPage extends SearchDelegate {
   @override
   List<Widget>? buildActions(BuildContext context) {
     return [
       IconButton(
         icon: const Icon(Icons.close),
-        onPressed: (){
+        onPressed: () {
           query = "";
         },
       ),
@@ -222,7 +223,7 @@ class SearchPage extends SearchDelegate{
   Widget? buildLeading(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.arrow_back),
-      onPressed: (){
+      onPressed: () {
         Navigator.pop(context);
       },
     );
@@ -230,39 +231,121 @@ class SearchPage extends SearchDelegate{
 
   @override
   Widget buildResults(BuildContext context) {
-    return Consumer<SearchProvider>(
-      builder: (context, state, _) {
-        if (state.state == ResultState.loading) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (state.state == ResultState.hasData) {
-          return ListView.builder(
-            shrinkWrap: true,
-            itemCount: state.result.restaurants.length,
-            itemBuilder: (context, index) {
-              var restaurants = state.result.restaurants[index];
-              return ListCard(restaurants: restaurants);
-            },
-          );
-        } else if (state.state == ResultState.noData) {
-          return Center(
-            child: Material(
-              child: Text(state.message),
-            ),
-          );
-        } else if (state.state == ResultState.error) {
-          return Center(
-            child: Material(
-              child: Text(state.message),
-            ),
-          );
-        } else {
-          return const Center(
-            child: Material(
-              child: Text(''),
-            ),
-          );
-        }
-      },
+    // return Consumer<SearchProvider>(
+    //   builder: (context, state, _) {
+    //     if (state.state == ResultState.loading) {
+    //       return const Center(child: CircularProgressIndicator());
+    //     } else if (state.state == ResultState.hasData) {
+    //       return ListView.builder(
+    //         shrinkWrap: true,
+    //         itemCount: state.result.restaurants.length,
+    //         itemBuilder: (context, index) {
+    //           var restaurants = state.result.restaurants[index];
+    //           return ListCard(restaurants: restaurants);
+    //         },
+    //       );
+    //     } else if (state.state == ResultState.noData) {
+    //       return Center(
+    //         child: Material(
+    //           child: Text(state.message),
+    //         ),
+    //       );
+    //     } else if (state.state == ResultState.error) {
+    //       return Center(
+    //         child: Material(
+    //           child: Text(state.message),
+    //         ),
+    //       );
+    //     } else {
+    //       return const Center(
+    //         child: Material(
+    //           child: Text(''),
+    //         ),
+    //       );
+    //     }
+    //   },
+    // );
+    // return ChangeNotifierProvider<SearchProvider>(
+    //   create: (_) => SearchProvider(apiService: ApiService())._fetchSearch(query),
+    //   child: Consumer<SearchProvider>(
+    //     builder: (context, state, _) {
+    //       if (state.state == ResultState.loading) {
+    //         return const Center(
+    //           child: CircularProgressIndicator(),
+    //         );
+    //       } else if (state.state == ResultState.hasData) {
+    //         return ListView.builder(
+    //           shrinkWrap: true,
+    //           itemCount: state.result!.restaurants.length,
+    //           itemBuilder: (context, index) {
+    //             var restaurants = state.result!.restaurants[index];
+    //             return ListCard(restaurants: restaurants);
+    //           },
+    //         );
+    //
+    //       } else if (state.state == ResultState.noData) {
+    //         return const Column(
+    //           mainAxisAlignment: MainAxisAlignment.center,
+    //           children: <Widget>[
+    //             Center(
+    //               child: Text(
+    //                 "There's no match to your search",
+    //               ),
+    //             )
+    //           ],
+    //         );
+    //       }
+    //     },
+    //   ),
+    // );
+    return ChangeNotifierProvider<SearchProvider>(
+      create: (_) => SearchProvider(apiService: ApiService(), searchQuery: query),
+      child: Consumer<SearchProvider>(
+        builder: (context, state, _) {
+          if (state.state == ResultState.loading) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (state.state == ResultState.hasData) {
+            return ListView.builder(
+              shrinkWrap: true,
+              itemCount: state.result.restaurants.length,
+              itemBuilder: (context, index) {
+                var restaurants = state.result.restaurants[index];
+                return ListCard(restaurants: restaurants);
+              },
+            );
+          } else if (state.state == ResultState.noData) {
+            return const Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Center(
+                  child: Text(
+                    "There's no match to your search",
+                  ),
+                ),
+              ],
+            );
+          } else if (state.state == ResultState.error) {
+            return const Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Center(
+                  child: Text(
+                    "An error occurred while fetching data",
+                  ),
+                ),
+              ],
+            );
+          } else {
+            return const Center(
+              child: Material(
+                child: Text(''),
+              ),
+            );
+          }
+        },
+      ),
     );
   }
 
@@ -271,9 +354,11 @@ class SearchPage extends SearchDelegate{
     return Center(
       child: Text(
         'Search Restaurants',
-        style: Theme.of(context).textTheme.titleMedium,
+        style: Theme
+            .of(context)
+            .textTheme
+            .titleMedium,
       ),
     );
   }
-
 }
